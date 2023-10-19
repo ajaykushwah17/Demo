@@ -13,10 +13,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
-          terraform_version: 5.10.0
+          node-version: '14'
+
+      - name: Install Terraform
+        run: |
+          curl -LO "https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_linux_amd64.zip"
+          unzip terraform_1.0.0_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+          terraform --version
 
       - name: Configure AWS credentials
         run: |
