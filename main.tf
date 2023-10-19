@@ -1,21 +1,20 @@
 terraform {
-  required_version = ">=0.13.0"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~>5.10.0"
+    required_providers {
+        aws = {
+            source = "hashicorp/aws"
+            version = "5.10.0"
+        }
+        }
     }
-  }
-}
-
-provider "aws" {
-  region = "ap-south-1"
-}
-
-resource "aws_instance" "example" {
-  ami           = "ami-067c21fb1979f0b27"
+    provider "aws" {
+        region = "ap-south-1"
+        access_key = "AKIA32BP4XBTFMFY2VFA"
+        secret_key = "ZhUApSJnRyARb9zX5azeN0I5nBvh9khBdNhtRJDT"
+    }
+    resource "aws_instance" "example" {
+  ami           = "ami-067c21fb1979f0b27" 
   instance_type = "t2.micro"
   tags = {
-    Name = "MyEC2Instance"
+    "Name" = "Myec2Instance"
   }
-}
+    }
