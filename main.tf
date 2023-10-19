@@ -12,7 +12,7 @@ terraform {
         secret_key = "ZhUApSJnRyARb9zX5azeN0I5nBvh9khBdNhtRJDT"
     }
     resource "aws_instance" "example" {
-  ami           = "ami-0df435f331839b2d6" 
+  ami           = "ami-0df435f331839b2d6 / ami-069ef9bcf69a50f63" 
   instance_type = "t2.micro"
   tags = {
     "Name" = "Myec2Instance"
