@@ -1,44 +1,37 @@
-name: "Terraform"
-
+name: Provision t3.micro EC2
 on:
-  push:
-    branches:
-      - main
-
+  workflow_dispatch:
+    inputs:
+      ec2_name:
+        description: EC2 name
+        required: true
+        default: 'Devops-techstack'
+        type: string
 jobs:
-  terraform:
-    name: "Terraform"
+  provision-ec2:
     runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          terraform_version: 1.0.1
+          node-version: '14'
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: '${{ secrets.TF_USER_AWS_KEY }}'
+          aws-secret-access-key: '${{ secrets.TF_USER_AWS_SECRET }}'
+          aws-region: us-east-2
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
           terraform_wrapper: false
-
-      - name: Terraform Format
-        id: fmt
-        run: terraform fmt -check
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color
-
       - name: Terraform Apply
-        id: apply
+        id:   apply
+        env:
+          TF_VAR_ec2_name:  "${{ github.event.inputs.ec2_name }}"
         run: |
-          if [ ${{ steps.plan.outcome }} == "success" ]; then
-            terraform apply -auto-approve
-          else
-            echo "Terraform plan failed. Skipping apply."
-          fi
+          cd tf-example/
+          terraform init
+          terraform validate
+          terraform plan 
+          terraform apply -auto-approve
