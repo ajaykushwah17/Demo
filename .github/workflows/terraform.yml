@@ -34,7 +34,7 @@ jobs:
       - name: Terraform Apply
         id: apply
         env:
-          TF_VAR_ec2_name: "${{ https://github.com/ajaykushwah17/Demo }}"
+          TF_VAR_ec2_name: "${{ https://github.com/ajaykushwah17/Demo/blob/main/main.tf }}"
         run: |
           cd tf-example/
           terraform init
