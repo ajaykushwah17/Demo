@@ -1,38 +1,48 @@
-name: "Terraform Workflow"
-
+name: 'Terraform AWS workflow'
 on:
+  workflow_dispatch:
+    inputs:
+      tfpath:
+        description: 'Terraform Configuration Path'
+        required: false
+        default: 'aws_sample/create_ec2'
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
 jobs:
-  terraform:
-    name: "Terraform Job"
+  tf_code_check:
+    name: 'Terraform'
     runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          terraform_version: 1.0.1
-          terraform_wrapper: false
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
 
-      - name: Terraform Format
-        id: fmt
-        run: terraform fmt -check
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Init
-        id: init
         run: terraform init
+        working-directory: ${{ github.workspace }}/${{ github.event.inputs.tfpath }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ${{ github.workspace }}/${{ github.event.inputs.tfpath }}
 
       - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color
+        run: terraform plan
+        working-directory: ${{ github.workspace }}/${{ github.event.inputs.tfpath }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        working-directory: ${{ github.workspace }}/${{ github.event.inputs.tfpath }}
