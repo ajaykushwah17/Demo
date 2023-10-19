@@ -35,4 +35,10 @@ jobs:
         run: terraform plan -no-color
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        id: apply
+        run: |
+          if [ ${{ steps.plan.outcome }} == "success" ]; then
+            terraform apply -auto-approve
+          else
+            echo "Terraform plan failed. Skipping apply."
+          fi
